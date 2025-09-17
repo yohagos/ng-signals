@@ -1,0 +1,12 @@
+{
+    "telemetry.feedback.enabled": false,
+    "chat.agent.enabled": false,
+    "chat.commandCenter.enabled": false,
+    "chat.notifyWindowOnConfirmation": false,
+    "python.analysis.aiCodeActions": {
+
+        "implementAbstractClasses": false,
+        "generateSymbol": false,
+        "convertFormatString": true
+    }
+}
