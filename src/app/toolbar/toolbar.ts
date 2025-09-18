@@ -59,6 +59,10 @@ export class Toolbar {
       name: 'Resource',
       uri: 'resources',
     },
+    {
+      name: 'Countdown',
+      uri: 'timer',
+    },
   ]
 
   naviagteTo(uri: string) {
