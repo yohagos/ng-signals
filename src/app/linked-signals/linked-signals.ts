@@ -1,81 +1,45 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, linkedSignal, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { LinkedSignalsPagination } from "./linked-signals-pagination/linked-signals-pagination";
+import { LinkedSignalsCountries } from "./linked-signals-countries/linked-signals-countries";
 
-const LAST_PAGE = 200;
 
 @Component({
   selector: 'app-linked-signals',
   imports: [
     CommonModule,
     FormsModule,
-  ],
+    LinkedSignalsPagination,
+    LinkedSignalsCountries
+],
   template: `
-    <div class="container">
-      <h2>Update the shorthand version of the linked signal</h2>
-    <div>
-      <button (click)="pageNumber.set(1)">First</button>
-      <button (click)="changePageNumber(-1)">Prev</button>
-      <button (click)="changePageNumber(1)">Next</button>
-      <button (click)="pageNumber.set(lastPage)">Last</button>
-      <p>Go to: <input type="number" [(ngModel)]="pageNumber" /></p>
+    <h2>Linked Signals -> Pagination</h2>
+    <app-linked-signals-pagination></app-linked-signals-pagination>
+    <div class="separation">
+      <hr>
     </div>
-    <p>Page Number: {{ pageNumber() }}</p>
-    <p>Current Page Number: {{ currentPageNumber() }}</p>
-    <p>Percentage of completion: {{ precentageOfCompletion() }}</p>
-    </div> 
+    <h2>Linked Signals -> Countries</h2>
+    <app-linked-signals-countries></app-linked-signals-countries>
   `,
   styles: `
-    .container {
-      width: 650px;
-      margin: 5em auto;
-      padding: 1em;
-      align-items: center;
+    .separation {
+      margin: 3em auto;
+      padding: 2em;
     }
 
-    button {
-      margin: auto 0.4em;
-      padding: 1em 3em;
-      border: 2px solid #e5a323a1;
-      color: #eeeeeea9;
-      background-color: transparent;
+    h2 {
+      margin: 0.5em auto;
+      display: flex;
+      justify-content: center;
     }
 
-    input {
-      background-color: transparent;
-      height: 1.5em;
-      color: #eeeeeea9;
-      font-size: 1.3em;
-    }
-
-    button:hover {
-      background-color: #e5a323a1;
-
-      transition: background-color 1.5s ease;
-    }
-
-    p {
-      font-size: 1.2em;
+    hr {
+      width: 70%;
+      margin: auto;
     }
   `
 })
 export class LinkedSignals {
-  lastPage = LAST_PAGE
-  pageNumber = signal(1)
-
-  currentPageNumber = linkedSignal<number, number>({
-    source: this.pageNumber,
-    computation: (pageNumber, previous) => {
-      if (!previous) {
-        return pageNumber
-      }
-      return (pageNumber < 1 || pageNumber > LAST_PAGE) ? previous.value : pageNumber
-    }
-  })
-
-  precentageOfCompletion = computed(() => `${((this.currentPageNumber() * 1.0) * 100 / LAST_PAGE).toFixed(2)}%`)
-
-  changePageNumber(offset: number) {
-    this.pageNumber.update((val) => Math.max(1, Math.min(LAST_PAGE, val + offset)))
-  }
+  
 }
