@@ -63,6 +63,10 @@ export class Toolbar {
       name: 'Countdown',
       uri: 'timer',
     },
+    {
+      name: 'LinkedSignals',
+      uri: 'linked',
+    },
   ]
 
   naviagteTo(uri: string) {
