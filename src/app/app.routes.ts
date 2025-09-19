@@ -3,6 +3,7 @@ import { App } from './app';
 import { SignalResources } from './signal-resources/signal-resources';
 import { Overview } from './overview/overview';
 import { CountdownTimer } from './countdown-timer/countdown-timer';
+import { LinkedSignals } from './linked-signals/linked-signals';
 
 export const routes: Routes = [
     {
@@ -16,6 +17,10 @@ export const routes: Routes = [
     {
         path: 'timer',
         component: CountdownTimer,
+    },
+    {
+        path: 'linked',
+        component: LinkedSignals
     },
     {
         path: '**',
