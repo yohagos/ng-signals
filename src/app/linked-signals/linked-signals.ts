@@ -5,6 +5,8 @@ import { LinkedSignalsPagination } from "./linked-signals-pagination/linked-sign
 import { LinkedSignalsCountries } from "./linked-signals-countries/linked-signals-countries";
 import { LinkedSignalsReset } from "./linked-signals-reset/linked-signals-reset";
 
+import { LinkedSignalsEncapsulate } from "./linked-signals-encapsulate/linked-signals-encapsulate";
+
 
 @Component({
   selector: 'app-linked-signals',
@@ -13,7 +15,8 @@ import { LinkedSignalsReset } from "./linked-signals-reset/linked-signals-reset"
     FormsModule,
     LinkedSignalsPagination,
     LinkedSignalsCountries,
-    LinkedSignalsReset
+    LinkedSignalsReset,
+    LinkedSignalsEncapsulate.
 ],
   template: `
     <h2>Linked Signals -> Pagination</h2>
@@ -28,6 +31,11 @@ import { LinkedSignalsReset } from "./linked-signals-reset/linked-signals-reset"
     </div>
     <h2>Linked Signals -> Show Sizes Reset / Retain </h2>
     <app-linked-signals-reset></app-linked-signals-reset>
+    <div class="separation">
+      <hr>
+    </div>
+    <h2>Linked Signals -> Show Sizes Encapsulate in a store </h2>
+    <app-linked-signals-encapsulate></app-linked-signals-encapsulate>
   `,
   styles: `
     .separation {
