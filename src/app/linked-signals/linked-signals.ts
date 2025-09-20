@@ -16,7 +16,7 @@ import { LinkedSignalsEncapsulate } from "./linked-signals-encapsulate/linked-si
     LinkedSignalsPagination,
     LinkedSignalsCountries,
     LinkedSignalsReset,
-    LinkedSignalsEncapsulate.
+    LinkedSignalsEncapsulate
 ],
   template: `
     <h2>Linked Signals -> Pagination</h2>
