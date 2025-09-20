@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LinkedSignalsPagination } from "./linked-signals-pagination/linked-signals-pagination";
 import { LinkedSignalsCountries } from "./linked-signals-countries/linked-signals-countries";
 import { LinkedSignalsReset } from "./linked-signals-reset/linked-signals-reset";
+
 import { LinkedSignalsEncapsulate } from "./linked-signals-encapsulate/linked-signals-encapsulate";
 
 
@@ -15,7 +16,7 @@ import { LinkedSignalsEncapsulate } from "./linked-signals-encapsulate/linked-si
     LinkedSignalsPagination,
     LinkedSignalsCountries,
     LinkedSignalsReset,
-    LinkedSignalsEncapsulate
+    LinkedSignalsEncapsulate.
 ],
   template: `
     <h2>Linked Signals -> Pagination</h2>
