@@ -1,50 +1,52 @@
 import { CommonModule, JsonPipe } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from './auth-service';
+import { Router } from '@angular/router';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-signal-forms',
   imports: [
     CommonModule,
     FormsModule,
-    JsonPipe,
+    ReactiveFormsModule,
   ],
   template: `
     <div class="container">
-      <form class="form">
-        <label for="firstName"> Firstname </label>
-          <input type="text" id="firstName" name="firstName" [(ngModel)]="firstName" required>
-        
-        <label for="lastName"> Lastname </label>
-          <input type="text" id="lastName" name="lastName" [(ngModel)]="lastName" required>
-        
-        <label for="email"> Email </label>
-          <input type="text" id="email" name="email" [(ngModel)]="email" required email>
-        
+      <form 
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+      >
+        <h2>Login</h2>
 
-        <div id="phone">
-          <label for="phone"> Phone </label>
-            @for (p of phone(); track i; let i = $index) {
-              <div>
-                <input for="phone" name="phone-{{ i }}" [(ngModel)]="phone" required>
-                <button type="button" (click)="removePhoneNumber(i)">Remove</button>
-              </div>
-            }
-            <button type="button" (click)="addPhoneNumber()">Add Phonenumber</button>
-          
+        <div class="form-inputs">
+          <input type="email" formControlName="email" placeholder="Email">
+          @if (form.get('email')?.invalid) {
+            <div class="invalid-feedback">Please enter a valid email.</div>
+          }
         </div>
 
-        <label for="street">Street</label> 
-        <input type="text" id="street" name="street" [(ngModel)]="street" required>
+        <div class="form-inputs">
+          <input type="password" formControlName="password" placeholder="Password">
+          @if (form.get("password")?.invalid) {
+            <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+          }
+        </div>
 
-        @if (!formValid()) {
-          <div class="message message-error">Form is invalid!</div>
-        } @else {
-          <div class="message message-success">Form is valid!</div>
+        @if (errorMessage()) {
+          <div class="message-error"> {{ errorMessage() }} </div>
+        } @else if (isLoggedIn()) {
+          <div class="message-success">Logged in successfully.</div>
         }
-        <pre>
-          {{formValue() | json}}
-        </pre>
+
+        <button type="submit" [disabled]="isLoading() || !isFormValid">
+          @if (isLoading()) {
+            Loading
+          }
+          Login
+        </button>
       </form>
     </div>
   `,
@@ -52,6 +54,12 @@ import { FormsModule } from '@angular/forms';
     .container {
       width: 600px;
       margin: 3em auto;
+    }
+
+    button {
+      padding: 1.3em 1.5em;
+      background-color: transparent;
+      margin: 10px;
     }
 
     .form {
@@ -66,68 +74,63 @@ import { FormsModule } from '@angular/forms';
       }
     }
 
-    .message {
-      display: flex;
-      justify-content: center;
+    .form-inputs {
+        margin-bottom: 1.7em;
+      }
 
-      &.message-error {
-        color: red;
+    .message-error {
+        color: #ff1212a1;
       }
-      &.message-success {
-        color: green;
-      }
+    .message-success {
+      color: #12ff12a1;
     }
-  
   `
 })
 export class SignalForms {
-  public firstName = signal("")
-  public lastName = signal("")
-  public email = signal("")
-
-  public phone = signal([signal("")])
-  public street = signal("")
-
-  public formValue = computed(() => {
-    return {
-      firstName: this.firstName(),
-      lastName: this.lastName(),
-      email: this.email(),
-      phone: this.phone().map((num) => num()),
-      address: {
-        street: this.street(),
-      },
-    }
+  private readonly authService = inject(AuthService)
+  private readonly fb = inject(FormBuilder)  
+  readonly form = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
   })
 
-  public formValid = computed(() => {
-    const { firstName, lastName, email, phone, address } = this.formValue()
+  readonly isLoading = signal(false)
+  readonly errorMessage = signal<string | null>(null)
 
-    const EMAIL_REGEX = /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
-    const isEmailFormatValid = EMAIL_REGEX.test(email)
-
-    return (
-      firstName.length > 0 &&
-      lastName.length > 0 &&
-      email.length > 0 &&
-      isEmailFormatValid &&
-      phone.length > 0 &&
-      phone.every((num) => num.length > 0) &&
-      address.street.length > 0
-    )
+  readonly formValue = toSignal(this.form.valueChanges, {
+    initialValue: this.form.value,
   })
 
-  addPhoneNumber() {
-    this.phone.update((num) => {
-      num.push(signal(""))
-      return [...num]
-    })
-  }
+  readonly formStatus = toSignal(this.form.statusChanges, {
+    initialValue: this.form.status,
+  })
 
-  removePhoneNumber(index: number) {
-    this.phone.update((num) => {
-      num.splice(index, 1)
-      return [...num]
-    })
+  readonly isFormValid = computed(() => this.formStatus() === 'VALID')
+
+  readonly isLoggedIn = signal(false)
+
+  onSubmit() {
+    if (!this.isFormValid()) return
+
+    const {email, password} = this.form.getRawValue()
+    if (!email || !password) return
+
+    this.isLoading.set(true)
+    this.errorMessage.set(null)
+
+    this.authService
+      .login({email, password})
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.isLoading.set(false)
+          this.isLoggedIn.set(true)
+        },
+        error: (err) => {
+          this.isLoading.set(false)
+          const message = err?.error?.message || 'Login failed. Please try again.'
+          this.errorMessage.set(message)
+        }
+      })
   }
 }
