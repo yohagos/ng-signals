@@ -67,6 +67,10 @@ export class Toolbar {
       name: 'LinkedSignals',
       uri: 'linked',
     },
+    {
+      name: 'SignalForms',
+      uri: 'forms',
+    }
   ]
 
   naviagteTo(uri: string) {

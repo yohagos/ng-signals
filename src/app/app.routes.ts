@@ -4,6 +4,7 @@ import { SignalResources } from './signal-resources/signal-resources';
 import { Overview } from './overview/overview';
 import { CountdownTimer } from './countdown-timer/countdown-timer';
 import { LinkedSignals } from './linked-signals/linked-signals';
+import { SignalForms } from './signal-forms/signal-forms';
 
 export const routes: Routes = [
     {
@@ -20,7 +21,11 @@ export const routes: Routes = [
     },
     {
         path: 'linked',
-        component: LinkedSignals
+        component: LinkedSignals,
+    },
+    {
+        path: 'forms',
+        component: SignalForms,
     },
     {
         path: '**',
